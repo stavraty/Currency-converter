@@ -8,8 +8,9 @@
 import Foundation
 
 struct Currency: Codable {
-    let currencyCode: String
-    let baseCurrencyCode: String
-    let buy: Double
-    let sale: Double
+    let ccy: String
+    let base_ccy: String
+    let buy: String
+    let sale: String
+    let timestamp: String?
 }

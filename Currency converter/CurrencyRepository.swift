@@ -22,7 +22,7 @@ class CurrencyRepository {
         guard let coordinator = context.persistentStoreCoordinator else {
             fatalError("Persistent store coordinator not found.")
         }
-
+        
         self.persistentContainer = NSPersistentContainer(name: "CurrencyDataModel")
         if let storeDescription = coordinator.persistentStores.first?.url {
             let persistentStoreDescription = NSPersistentStoreDescription(url: storeDescription)
@@ -62,7 +62,7 @@ class CurrencyRepository {
             
             do {
                 try context.save()
-                print("Currency rate saved successfully")
+                print("Currency rate saved successfully (CurrencyRepository)")
             } catch let error as NSError {
                 print("Failed to save currency rate: \(error)")
             }
@@ -76,7 +76,7 @@ class CurrencyRepository {
         do {
             try context.execute(deleteRequest)
             try context.save()
-            print("All currency rates deleted successfully")
+            print("All currency rates deleted successfully (CurrencyRepository)")
         } catch let error as NSError {
             print("Failed to delete all currency rates: \(error)")
         }
@@ -92,5 +92,40 @@ class CurrencyRepository {
             print("Failed to fetch currency rates from Core Data: \(error)")
             return nil
         }
+    }
+    
+    func getLastUpdateTimestamp() -> String? {
+        let fetchRequest: NSFetchRequest<CurrencyRate> = CurrencyRate.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        
+        do {
+            let result = try context.fetch(fetchRequest)
+            let lastCurrencyRate = result.first
+            let timestamp = lastCurrencyRate?.timestamp
+            return timestamp
+        } catch let error as NSError {
+            print("Failed to fetch last update timestamp: \(error)")
+            return nil
+        }
+    }
+    
+    func shouldFetchCurrencyRates() -> Bool {
+        guard let lastUpdateTimestamp = getLastUpdateTimestamp() else {
+            return true
+        }
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd MMMM yyyy h:mm a"
+        
+        guard let lastUpdateDate = dateFormatter.date(from: lastUpdateTimestamp) else {
+            return true
+        }
+        
+        let currentDate = Date()
+        let timeInterval = currentDate.timeIntervalSince(lastUpdateDate)
+        let hoursPassed = timeInterval / 3600
+        let updateThreshold: TimeInterval = 1
+        return hoursPassed >= updateThreshold
     }
 }

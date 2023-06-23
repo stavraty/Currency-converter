@@ -21,6 +21,7 @@
 		F0A93DA22A0A5B8F0061CD6A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F0A93DA02A0A5B8F0061CD6A /* LaunchScreen.storyboard */; };
 		F0A93DAD2A0A5B8F0061CD6A /* Currency_converterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A93DAC2A0A5B8F0061CD6A /* Currency_converterTests.swift */; };
 		F0A93DB72A0A5B8F0061CD6A /* Currency_converterUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A93DB62A0A5B8F0061CD6A /* Currency_converterUITests.swift */; };
+		F0F96D2D2A41BE5C00528AA9 /* CurrencySelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0F96D2C2A41BE5C00528AA9 /* CurrencySelectionViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +60,7 @@
 		F0A93DAC2A0A5B8F0061CD6A /* Currency_converterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Currency_converterTests.swift; sourceTree = "<group>"; };
 		F0A93DB22A0A5B8F0061CD6A /* Currency converterUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Currency converterUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F0A93DB62A0A5B8F0061CD6A /* Currency_converterUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Currency_converterUITests.swift; sourceTree = "<group>"; };
+		F0F96D2C2A41BE5C00528AA9 /* CurrencySelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencySelectionViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +123,7 @@
 				F0A93D952A0A5B8C0061CD6A /* AppDelegate.swift */,
 				F0A93D972A0A5B8C0061CD6A /* SceneDelegate.swift */,
 				F0A93D992A0A5B8C0061CD6A /* ViewController.swift */,
+				F0F96D2C2A41BE5C00528AA9 /* CurrencySelectionViewController.swift */,
 				F0A93D9B2A0A5B8C0061CD6A /* Main.storyboard */,
 				F0A93D9E2A0A5B8F0061CD6A /* Assets.xcassets */,
 				F0A93DA02A0A5B8F0061CD6A /* LaunchScreen.storyboard */,
@@ -284,6 +287,7 @@
 			files = (
 				F0957E902A1BBD5600D5931D /* CurrencyDataModel.xcdatamodeld in Sources */,
 				F08066632A1403DB003BD67B /* Currency.swift in Sources */,
+				F0F96D2D2A41BE5C00528AA9 /* CurrencySelectionViewController.swift in Sources */,
 				F08066652A1405FF003BD67B /* CurrencyAPI.swift in Sources */,
 				F0A93D9A2A0A5B8C0061CD6A /* ViewController.swift in Sources */,
 				F08783E12A14DBA1005E792C /* CurrencyCell.swift in Sources */,

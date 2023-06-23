@@ -22,35 +22,44 @@ class CurrencyAPI {
             completion(nil)
             return
         }
-        
+
         URLSession.shared.dataTask(with: url) { [weak self] (data, response, error) in
             if let error = error {
                 print("Error fetching currency rates:", error)
-                completion(nil)
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
                 return
             }
-            
+
             guard let data = data else {
-                completion(nil)
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
                 return
             }
-            
+
             do {
                 let currencies = try JSONDecoder().decode([Currency].self, from: data)
-                completion(currencies)
                 
-                self?.saveCurrenciesToCoreData(currencies)
+                self?.saveCurrenciesToCoreData(currencies) {
+                    DispatchQueue.main.async {
+                        completion(currencies)
+                    }
+                }
             } catch {
                 print("Error decoding currency rates:", error)
-                completion(nil)
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
             }
         }.resume()
     }
     
-    private func saveCurrenciesToCoreData(_ currencies: [Currency]) {
-
+    private func saveCurrenciesToCoreData(_ currencies: [Currency], completion: @escaping () -> Void) {
         DispatchQueue.main.async {
             guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+                completion()
                 return
             }
             
@@ -63,6 +72,8 @@ class CurrencyAPI {
                 try context.execute(deleteRequest)
             } catch {
                 print("Error deleting currency rates from CoreData:", error)
+                completion()
+                return
             }
 
             for currency in currencies {
@@ -71,13 +82,16 @@ class CurrencyAPI {
                 currencyRate.ccy = currency.ccy
                 currencyRate.buy = currency.buy
                 currencyRate.sale = currency.sale
-                currencyRate.timestamp = currency.timestamp
+                currencyRate.timestamp = currency.timestamp ?? ""
             }
             
             do {
                 try context.save()
+                print("Currency rates saved successfully (from API)")
+                completion()
             } catch {
                 print("Error saving currency rates to CoreData:", error)
+                completion()
             }
         }
     }

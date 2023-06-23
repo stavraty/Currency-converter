@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina6_1" orientation="portrait" appearance="light"/>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="mhR-8a-JNb">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
@@ -12,22 +12,22 @@
         <!--View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="Currency_converter" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="Main" id="BYZ-38-t0r" customClass="ViewController" customModule="Currency_converter" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zGK-yz-f9f">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="264"/>
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="264"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kdM-QD-HKP">
-                                        <rect key="frame" x="-51" y="-83" width="517" height="339"/>
+                                        <rect key="frame" x="-51" y="-83" width="496" height="339"/>
                                         <subviews>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="b3W-EA-1qk">
-                                                <rect key="frame" x="-71" y="-39" width="547" height="349"/>
+                                                <rect key="frame" x="-71" y="-39" width="526" height="349"/>
                                                 <subviews>
                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8wi-9L-rOb">
-                                                        <rect key="frame" x="0.0" y="-27" width="519" height="349"/>
+                                                        <rect key="frame" x="0.0" y="-27" width="498" height="349"/>
                                                         <subviews>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Currency Converter" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JjM-Bz-WFn">
                                                                 <rect key="frame" x="137" y="238" width="221" height="29"/>
@@ -216,10 +216,10 @@
                                 </variation>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7Vs-zi-KeK">
-                                <rect key="frame" x="16" y="152" width="382" height="551"/>
+                                <rect key="frame" x="16" y="207" width="361" height="452"/>
                                 <subviews>
                                     <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="sA2-t9-LDh">
-                                        <rect key="frame" x="8" y="8" width="366" height="45"/>
+                                        <rect key="frame" x="8" y="8" width="345" height="45"/>
                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                         <rect key="contentStretch" x="1" y="1" width="1" height="1"/>
                                         <constraints>
@@ -255,19 +255,23 @@
                                                 <include reference="lHN-ZD-Yeo"/>
                                             </mask>
                                         </variation>
+                                        <connections>
+                                            <action selector="sellBuySegmentChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="jgS-OI-x28"/>
+                                        </connections>
                                     </segmentedControl>
-                                    <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="lL2-Zd-E9D">
-                                        <rect key="frame" x="8" y="82" width="366" height="370"/>
+                                    <tableView clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="currencyTableView" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="lL2-Zd-E9D">
+                                        <rect key="frame" x="8" y="82" width="345" height="271"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <inset key="separatorInset" minX="15" minY="0.0" maxX="0.0" maxY="0.0"/>
                                         <prototypes>
-                                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="CurrencyCell" id="YfE-J6-ygw">
-                                                <rect key="frame" x="0.0" y="50" width="366" height="44"/>
+                                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="currencyCell" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="currencyCell" id="YfE-J6-ygw" customClass="CurrencyCell" customModule="Currency_converter" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="50" width="345" height="44"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="YfE-J6-ygw" id="JVP-8o-oyG">
-                                                    <rect key="frame" x="0.0" y="0.0" width="366" height="44"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="345" height="44"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                 </tableViewCellContentView>
+                                                <accessibility key="accessibilityConfiguration" identifier="currencyCell"/>
                                             </tableViewCell>
                                         </prototypes>
                                         <sections/>
@@ -276,13 +280,8 @@
                                             <outlet property="delegate" destination="BYZ-38-t0r" id="BqH-Jl-chn"/>
                                         </connections>
                                     </tableView>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="f2V-26-CYx">
-                                        <rect key="frame" x="108.5" y="492" width="165" height="35"/>
-                                        <state key="normal" title="Button"/>
-                                        <buttonConfiguration key="configuration" style="plain" image="plus.circle.fill" catalog="system" title="Add Currency" imagePadding="10"/>
-                                    </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gvz-EE-7Ty">
-                                        <rect key="frame" x="329" y="516.5" width="53" height="34.5"/>
+                                        <rect key="frame" x="308" y="417.66666666666663" width="53" height="34.333333333333314"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="40" id="7qi-Ac-7kg"/>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="40" id="yPJ-lc-3oC"/>
@@ -303,6 +302,20 @@
                                                 <include reference="yPJ-lc-3oC"/>
                                             </mask>
                                         </variation>
+                                        <connections>
+                                            <action selector="tapToShareButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="SXX-pU-4QP"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="f2V-26-CYx">
+                                        <rect key="frame" x="97.666666666666686" y="418" width="166" height="26"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="166" id="h3y-IQ-U08"/>
+                                        </constraints>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" image="plus.circle.fill" catalog="system" title="Add Currency" imagePadding="10"/>
+                                        <connections>
+                                            <action selector="addCurrencyButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="X3b-A3-qpn"/>
+                                        </connections>
                                     </button>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -310,7 +323,7 @@
                                     <constraint firstAttribute="trailing" secondItem="lL2-Zd-E9D" secondAttribute="trailing" constant="175" id="00U-uV-egx"/>
                                     <constraint firstAttribute="bottom" secondItem="gvz-EE-7Ty" secondAttribute="bottom" id="2zf-kq-Hhh"/>
                                     <constraint firstItem="gvz-EE-7Ty" firstAttribute="top" secondItem="7Vs-zi-KeK" secondAttribute="top" constant="511" id="4Qe-Z7-I3G"/>
-                                    <constraint firstAttribute="bottom" secondItem="f2V-26-CYx" secondAttribute="bottom" constant="24" id="9cy-Lb-0p1"/>
+                                    <constraint firstAttribute="bottom" secondItem="f2V-26-CYx" secondAttribute="bottom" constant="8" id="9cy-Lb-0p1"/>
                                     <constraint firstAttribute="trailing" secondItem="sA2-t9-LDh" secondAttribute="trailing" constant="8" id="BDQ-ax-8ta"/>
                                     <constraint firstItem="lL2-Zd-E9D" firstAttribute="top" secondItem="7Vs-zi-KeK" secondAttribute="top" constant="105" id="BU4-jz-wqC"/>
                                     <constraint firstItem="sA2-t9-LDh" firstAttribute="top" secondItem="7Vs-zi-KeK" secondAttribute="top" constant="8" id="Fki-zj-XlN"/>
@@ -339,7 +352,7 @@
                                     <constraint firstAttribute="trailing" secondItem="gvz-EE-7Ty" secondAttribute="trailing" id="o56-sn-IGl"/>
                                     <constraint firstItem="sA2-t9-LDh" firstAttribute="top" secondItem="7Vs-zi-KeK" secondAttribute="top" constant="8" id="oZC-pf-d78"/>
                                     <constraint firstAttribute="bottom" secondItem="f2V-26-CYx" secondAttribute="bottom" constant="8" id="opM-IE-15y"/>
-                                    <constraint firstItem="f2V-26-CYx" firstAttribute="top" secondItem="7Vs-zi-KeK" secondAttribute="top" constant="492" id="qRR-a2-gSE"/>
+                                    <constraint firstItem="f2V-26-CYx" firstAttribute="top" secondItem="7Vs-zi-KeK" secondAttribute="top" constant="418" id="qRR-a2-gSE"/>
                                     <constraint firstAttribute="trailing" secondItem="lL2-Zd-E9D" secondAttribute="trailing" constant="222" id="ryg-Wb-I95"/>
                                     <constraint firstAttribute="bottom" secondItem="lL2-Zd-E9D" secondAttribute="bottom" constant="140" id="s1i-57-gCa"/>
                                     <constraint firstItem="gvz-EE-7Ty" firstAttribute="leading" secondItem="7Vs-zi-KeK" secondAttribute="leading" constant="334" id="uNL-M7-vMU"/>
@@ -442,7 +455,7 @@
                                 </variation>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Last Updated" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bjK-Y5-INR">
-                                <rect key="frame" x="20" y="711" width="150" height="15"/>
+                                <rect key="frame" x="20" y="667" width="150" height="15"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="G3P-mG-KOf"/>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="b9O-vV-ZvK"/>
@@ -475,7 +488,7 @@
                                 </variation>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="22 May 2021 7:03 PM" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lcQ-3F-jcX">
-                                <rect key="frame" x="20" y="726" width="150" height="15"/>
+                                <rect key="frame" x="20" y="682" width="150" height="15"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="8pP-J4-1fR"/>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="Qc0-pM-OVe"/>
@@ -662,6 +675,7 @@
                             </mask>
                         </variation>
                     </view>
+                    <navigationItem key="navigationItem" id="m5s-SA-MVH"/>
                     <connections>
                         <outlet property="addCurrencyButton" destination="f2V-26-CYx" id="2P5-qu-YQJ"/>
                         <outlet property="bodyView" destination="7Vs-zi-KeK" id="bp6-0R-khb"/>
@@ -678,35 +692,79 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="30.434782608695656" y="-60.267857142857139"/>
+            <point key="canvasLocation" x="956.48854961832058" y="-60.563380281690144"/>
         </scene>
-        <!--Table View Controller-->
-        <scene sceneID="xFX-UU-6Fe">
+        <!--Currency-->
+        <scene sceneID="3xV-o6-zDL">
             <objects>
-                <tableViewController id="aHz-hK-Oou" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="Z2A-iu-fch">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                <viewController storyboardIdentifier="CurrencySelectionViewController" id="U2a-1k-hjv" customClass="CurrencySelectionViewController" customModule="Currency_converter" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="m8I-rg-aW5">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="AMV-Nt-KdK">
-                                <rect key="frame" x="0.0" y="50" width="414" height="43.5"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="AMV-Nt-KdK" id="qeU-iF-2wE">
-                                    <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </tableViewCellContentView>
-                            </tableViewCell>
-                        </prototypes>
-                        <connections>
-                            <outlet property="dataSource" destination="aHz-hK-Oou" id="iKQ-GU-yDW"/>
-                            <outlet property="delegate" destination="aHz-hK-Oou" id="6hV-Rt-W7p"/>
-                        </connections>
-                    </tableView>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="dj5-Ix-qIx" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="9YF-Yb-qyo">
+                                <rect key="frame" x="16" y="103" width="361" height="715"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="CurrencySelection" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="CurrencySelection" textLabel="9QA-71-PlQ" style="IBUITableViewCellStyleDefault" id="0tB-TM-BG0">
+                                        <rect key="frame" x="0.0" y="50" width="361" height="47.666667938232422"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="0tB-TM-BG0" id="0qD-B3-3M3">
+                                            <rect key="frame" x="0.0" y="0.0" width="361" height="47.666667938232422"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="9QA-71-PlQ">
+                                                    <rect key="frame" x="20" y="0.0" width="321" height="47.666667938232422"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <accessibility key="accessibilityConfiguration" identifier="CurrencySelection"/>
+                                    </tableViewCell>
+                                </prototypes>
+                                <sections/>
+                            </tableView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="7oV-E1-EIX"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <accessibility key="accessibilityConfiguration" label="Currency"/>
+                        <constraints>
+                            <constraint firstItem="9YF-Yb-qyo" firstAttribute="leading" secondItem="7oV-E1-EIX" secondAttribute="leading" constant="16" id="AKp-3e-YU5"/>
+                            <constraint firstItem="9YF-Yb-qyo" firstAttribute="top" secondItem="7oV-E1-EIX" secondAttribute="top" id="Cz8-xu-7x0"/>
+                            <constraint firstItem="9YF-Yb-qyo" firstAttribute="bottom" secondItem="7oV-E1-EIX" secondAttribute="bottom" id="XH1-L0-SDY"/>
+                            <constraint firstItem="7oV-E1-EIX" firstAttribute="trailing" secondItem="9YF-Yb-qyo" secondAttribute="trailing" constant="16" id="w3R-w8-Vxk"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Currency" id="DUs-BC-bZW" userLabel="Currency"/>
+                    <splitViewDetailSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <connections>
+                        <outlet property="currencyTableView" destination="9YF-Yb-qyo" id="aed-ko-537"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="7fu-gW-miQ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="929" y="-60"/>
+            <point key="canvasLocation" x="1854.1984732824426" y="-61.267605633802823"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="vSS-cw-cAe">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="mhR-8a-JNb" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="dbe-tR-h8l">
+                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="vTM-P1-fx6"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="VbI-Vt-06G" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="29.770992366412212" y="-60.563380281690144"/>
         </scene>
     </scenes>
     <resources>

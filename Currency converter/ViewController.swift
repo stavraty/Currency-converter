@@ -32,6 +32,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     var isEditingFirstTextField = false
     var amount: Double = 0.0
     var selectedCurrency: Currency?
+    var selectedCurrencies: [Currency] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,6 +48,11 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
+        
+        // Додавання свайпу для видалення рядків
+        let swipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeGesture(_:)))
+        swipeGestureRecognizer.direction = .left
+        currencyTableView.addGestureRecognizer(swipeGestureRecognizer)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -59,10 +65,12 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }
         
         if let currency = selectedCurrency {
-            if !currencies.contains(where: { $0.ccy == currency.ccy }) {
-                currencies.append(currency)
+            if !selectedCurrencies.contains(where: { $0.ccy == currency.ccy }) {
+                selectedCurrencies.append(currency)
                 selectedCurrency = nil
-                currencyTableView.reloadData()
+                DispatchQueue.main.async {
+                    self.currencyTableView.reloadData()
+                }
             }
         }
     }
@@ -89,29 +97,23 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return currencies.count
+        return selectedCurrencies.count + 2
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        print("tableView(_:cellForRowAt:) called")
         let cell = tableView.dequeueReusableCell(withIdentifier: "currencyCell", for: indexPath) as! CurrencyCell
-        print("CurrencyCell created")
+        
         if indexPath.row == 0 {
             cell.currencyButton.setTitle("UAH", for: .normal)
-            cell.currencyAmountTextField.text = "0"
-            cell.currencyAmountTextField.tag = 100
-            firstCell = cell
         } else if indexPath.row == 1 {
             cell.currencyButton.setTitle("USD", for: .normal)
-            cell.currencyAmountTextField.text = "0"
-            cell.currencyAmountTextField.tag = 101
         } else {
-            let currency = currencies[indexPath.row - 2]
+            let currency = selectedCurrencies[indexPath.row - 2]
             cell.currencyButton.setTitle(currency.ccy, for: .normal)
-            cell.currencyAmountTextField.text = "0"
-            cell.currencyAmountTextField.tag = indexPath.row + 100
         }
-        print("Setting delegate for cell at row \(indexPath.row)")
+        
+        cell.currencyAmountTextField.text = "0"
+        cell.currencyAmountTextField.tag = indexPath.row + 100
         cell.currencyAmountTextField.delegate = self
         cell.delegate = self
         return cell
@@ -125,75 +127,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }
         let currencyAmountTextField = secondCell.currencyAmountTextField
     }
-    
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        print("Did begin editing: \(textField)")
-    }
-    
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        print("Method called with string: \(string)")
-
-        let decimalSeparator = Locale.current.decimalSeparator ?? "."
-        let allowedCharacterSet = CharacterSet(charactersIn: "0123456789\(decimalSeparator)")
-        let replacementStringCharacterSet = CharacterSet(charactersIn: string)
-        let isNumeric = allowedCharacterSet.isSuperset(of: replacementStringCharacterSet)
-
-        if string == decimalSeparator && textField.text!.contains(decimalSeparator) {
-            print("Double decimal separator detected")
-            return false
-        }
-
-        guard isNumeric else {
-            print("Non numeric input detected")
-            return false
-        }
-
-        guard let superview = textField.superview as? UITableViewCell,
-              let indexPath = currencyTableView.indexPath(for: superview),
-              let cell = currencyTableView.cellForRow(at: indexPath) as? CurrencyCell else {
-            print("Cannot cast to CurrencyCell")
-            return true
-        }
-
-        let updatedText = (textField.text! as NSString).replacingCharacters(in: range, with: string)
-        print("Updated text is: \(updatedText)")
-
-        if updatedText.isEmpty {
-            print("Updated text is empty")
-            textField.text = updatedText
-            convertCurrencyAndUpdateSecondRow()
-            return false
-        } else if updatedText == "0" && string != "." {
-            print("Updated text is zero")
-            textField.text = string
-            convertCurrencyAndUpdateSecondRow()
-            return false
-        }
-
-        if textField == firstCell?.currencyAmountTextField {
-            print("First cell is being edited")
-            for indexPath in currencyTableView.indexPathsForVisibleRows ?? [] {
-                guard let cell = currencyTableView.cellForRow(at: indexPath) as? CurrencyCell else {
-                    print("Cannot cast to CurrencyCell")
-                    continue
-                }
-
-                let currency = currencies[indexPath.row]
-                let useBuyRate = sellBuySegmentedControl.selectedSegmentIndex == 1
-                let convertedAmount = convertCurrency(Double(updatedText) ?? 0.0, from: "UAH", to: currency.ccy, useBuyRate: useBuyRate)
-                cell.currencyAmountTextField.text = String(format: "%.2f", convertedAmount)
-            }
-        } else if textField == cell.currencyAmountTextField {
-            print("Other cell is being edited")
-            let currency = currencies[0]
-            let useBuyRate = sellBuySegmentedControl.selectedSegmentIndex == 1
-            let convertedAmount = convertCurrency(Double(updatedText) ?? 0.0, from: currency.ccy, to: "UAH", useBuyRate: useBuyRate)
-            firstCell?.currencyAmountTextField.text = String(format: "%.2f", convertedAmount)
-        }
-        print("Current textField text: \(textField.text ?? "nil")")
-        return false
-    }
-
     
     func currencyCell(_ cell: CurrencyCell, didChangeText text: String?) {
         guard let text = text, let amount = Double(text) else { return }
@@ -220,7 +153,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             currencies = currencyRepository?.getCurrencyRates() ?? []
             currencyTableView.reloadData()
             convertCurrencyAndUpdateSecondRow()
-            //  print("Currency rates from Core Data: \(currencyRates)")
             
             if let timestamp = currencyRates.first?.timestamp {
                 updateDataLabel(with: timestamp)
@@ -288,7 +220,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }
         return nil
     }
-    
+
     func convertCurrencyAndUpdateSecondRow() {
         let firstRowIndexPath = IndexPath(row: 0, section: 0)
         let secondRowIndexPath = IndexPath(row: 1, section: 0)
@@ -314,7 +246,14 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                     continue
                 }
                 
-                let currency = currencies[indexPath.row]
+                let currency: Currency
+                
+                if indexPath.row < 2 {
+                    currency = Currency(ccy: indexPath.row == 0 ? "UAH" : "USD", base_ccy: "", buy: "", sale: "", timestamp: "default_timestamp")
+                } else {
+                    currency = selectedCurrencies[indexPath.row - 2]
+                }
+                
                 let convertedAmount = convertCurrency(targetAmount, from: targetCurrency, to: currency.ccy, useBuyRate: useBuyRate)
                 
                 DispatchQueue.main.async {
@@ -328,17 +267,19 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         DispatchQueue.main.async {
             secondCell.currencyAmountTextField.text = String(format: "%.2f", convertedAmount)
         }
-    }
-    
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        convertCurrencyAndUpdateSecondRow()
         
-        guard let superview = textField.superview as? UITableViewCell, let indexPath = currencyTableView.indexPath(for: superview), let cell = currencyTableView.cellForRow(at: indexPath) as? CurrencyCell else {
-            return
+        // Оновлення третього рядка
+        let thirdRowIndexPath = IndexPath(row: 2, section: 0)
+        if let thirdCell = currencyTableView.cellForRow(at: thirdRowIndexPath) as? CurrencyCell,
+           let thirdCurrency = selectedCurrencies.first {
+            let convertedAmount = convertCurrency(amount, from: sourceCurrency, to: thirdCurrency.ccy, useBuyRate: useBuyRate)
+            DispatchQueue.main.async {
+                thirdCell.currencyAmountTextField.text = String(format: "%.2f", convertedAmount)
+            }
         }
-        cell.currencyAmountTextField.text = textField.text
     }
-    
+
+
     func didFinishFetchingCurrencyRates(_ currencies: [Currency]?) {
         if let currencies = currencies {
             self.currencies = currencies
@@ -409,7 +350,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         print(convertedAmount)
         return convertedAmount
     }
-
     
     @IBAction func addCurrencyButtonTapped(_ sender: Any) {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
@@ -420,17 +360,61 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     func currencySelectionViewController(_ viewController: CurrencySelectionViewController, didSelectCurrency currency: Currency) {
-        selectedCurrency = currency
-        navigationController?.popViewController(animated: true)
-        currencyTableView.reloadData()
+        if currency.ccy == "USD" {
+            let secondRowIndexPath = IndexPath(row: 1, section: 0)
+            if let secondCell = currencyTableView.cellForRow(at: secondRowIndexPath) as? CurrencyCell,
+               let currentCurrency = secondCell.currencyButton.currentTitle,
+               currentCurrency == "USD" {
+                return
+            }
+        }
+
+        if selectedCurrencies.contains(where: { $0.ccy == currency.ccy }) {
+            return
+        }
+        self.selectedCurrencies.append(currency)
+        DispatchQueue.main.async {
+            self.currencyTableView.reloadData()
+        }
     }
     
     @IBAction func tapToShareButton(_ sender: Any) {
-        self.convertCurrencyAndUpdateSecondRow()
+
+        let useBuyRate = sellBuySegmentedControl.selectedSegmentIndex == 1
+        let rateType = useBuyRate ? "Buy" : "Sale"
+        
+        var shareText = "Currency Rates (\(rateType)):\n\n"
+        for indexPath in currencyTableView.indexPathsForVisibleRows ?? [] {
+            if let cell = currencyTableView.cellForRow(at: indexPath) as? CurrencyCell {
+                let currency = cell.currencyButton.currentTitle ?? ""
+                let amount = cell.currencyAmountTextField.text ?? "0"
+                shareText += "\(currency): \(amount)\n"
+            }
+        }
+
+        let activityViewController = UIActivityViewController(activityItems: [shareText], applicationActivities: nil)
+        activityViewController.popoverPresentationController?.sourceView = view
+        present(activityViewController, animated: true, completion: nil)
     }
     
     @IBAction func sellBuySegmentChanged(_ sender: Any) {
         let useBuyRate = (sender as AnyObject).selectedSegmentIndex == 1
         convertCurrencyAndUpdateSecondRow()
+    }
+    
+    @objc func handleSwipeGesture(_ gestureRecognizer: UISwipeGestureRecognizer) {
+        guard let swipeIndexPath = getIndexPathForSwipeGesture(gestureRecognizer) else {
+            return
+        }
+        
+        if swipeIndexPath.row > 1 {
+            selectedCurrencies.remove(at: swipeIndexPath.row - 2)
+            currencyTableView.deleteRows(at: [swipeIndexPath], with: .left)
+        }
+    }
+    
+    func getIndexPathForSwipeGesture(_ gestureRecognizer: UISwipeGestureRecognizer) -> IndexPath? {
+        let swipeLocation = gestureRecognizer.location(in: currencyTableView)
+        return currencyTableView.indexPathForRow(at: swipeLocation)
     }
 }

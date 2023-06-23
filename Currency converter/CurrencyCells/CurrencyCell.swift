@@ -41,10 +41,16 @@ class CurrencyCell: UITableViewCell {
 
 extension CurrencyCell: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        let allowedCharacters = CharacterSet.decimalDigits
-        let characterSet = CharacterSet(charactersIn: string)
-        return allowedCharacters.isSuperset(of: characterSet)
+        let decimalSeparator = "."
+        let allowedCharacterSet = CharacterSet(charactersIn: "0123456789\(decimalSeparator)")
+        let replacementStringCharacterSet = CharacterSet(charactersIn: string)
+        
+        if string == decimalSeparator && textField.text!.contains(decimalSeparator) {
+            return false
+        }
+        return allowedCharacterSet.isSuperset(of: replacementStringCharacterSet)
     }
+    
     func textFieldDidEndEditing(_ textField: UITextField) {
         textField.resignFirstResponder()
     }

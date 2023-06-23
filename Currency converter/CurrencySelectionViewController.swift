@@ -37,6 +37,8 @@ class CurrencySelectionViewController: UIViewController, UITableViewDelegate, UI
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedCurrency = currencies[indexPath.row]
+        print("Выбранная валюта: \(selectedCurrency.ccy)")
         delegate?.currencySelectionViewController(self, didSelectCurrency: selectedCurrency)
+        self.navigationController?.popViewController(animated: true)
     }
 }

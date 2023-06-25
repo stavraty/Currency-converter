@@ -162,7 +162,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         convertCurrencyAndUpdateRows(from: lastEditedIndexPath)
     }
 
-    func convertCurrencyAndUpdateRows(from sourceIndexPath: IndexPath?) {
+    private func convertCurrencyAndUpdateRows(from sourceIndexPath: IndexPath?) {
         guard let sourceIndexPath = sourceIndexPath,
               let sourceCell = currencyTableView.cellForRow(at: sourceIndexPath) as? CurrencyCell,
               let sourceCurrency = sourceCell.currencyButton.currentTitle,
@@ -189,18 +189,18 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }
     }
     
-    func getCurrentTimestamp() -> String {
+    private func getCurrentTimestamp() -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd MMMM yyyy h:mm a"
         let currentTimestamp = dateFormatter.string(from: Date())
         return currentTimestamp
     }
     
-    func updateDataLabel(with timestamp: String) {
+    private func updateDataLabel(with timestamp: String) {
         updateDataLabel.text = timestamp
     }
     
-    func fetchCurrencyRates() {
+    private func fetchCurrencyRates() {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd MMMM yyyy h:mm a"
         
@@ -214,7 +214,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }
     }
     
-    func fetchCurrencyRatesFromCoreData() {
+    private func fetchCurrencyRatesFromCoreData() {
         if let currencyRates = currencyRepository?.getCurrencyRates() {
             currencies = currencyRates
             currencies = currencyRepository?.getCurrencyRates() ?? []
@@ -226,7 +226,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }
     }
     
-    func fetchCurrencyRatesFromAPI() {
+    private func fetchCurrencyRatesFromAPI() {
         currencyAPI.fetchCurrencyRates { currencies in
             if let currencies = currencies {
                 self.currencyRepository?.deleteAllCurrencyRates()
@@ -248,7 +248,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }
     }
     
-    func findCurrencyCell(for currency: Currency) -> CurrencyCell? {
+    private func findCurrencyCell(for currency: Currency) -> CurrencyCell? {
         for section in 0..<currencyTableView.numberOfSections {
             for row in 0..<currencyTableView.numberOfRows(inSection: section) {
                 if let cell = currencyTableView.cellForRow(at: IndexPath(row: row, section: section)) as? CurrencyCell {
@@ -279,7 +279,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }
     }
     
-    func convertCurrency(_ amount: Double, from sourceCurrency: String, to targetCurrency: String, useBuyRate: Bool) -> Double {
+    private func convertCurrency(_ amount: Double, from sourceCurrency: String, to targetCurrency: String, useBuyRate: Bool) -> Double {
         var sourceRate: Double = 1.0
         var targetRate: Double = 1.0
         

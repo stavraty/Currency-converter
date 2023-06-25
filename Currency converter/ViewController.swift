@@ -353,7 +353,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     @IBAction func tapToShareButton(_ sender: Any) {
-        
         let useBuyRate = sellBuySegmentedControl.selectedSegmentIndex == 1
         let rateType = useBuyRate ? "Buy" : "Sale"
         
@@ -366,6 +365,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             }
         }
         
+        if let lastUpdatedDateString = currencyRepository?.getLastUpdateTimestamp() {
+            shareText += "\nLast updated: \(lastUpdatedDateString)"
+        }
+
         let activityViewController = UIActivityViewController(activityItems: [shareText], applicationActivities: nil)
         activityViewController.popoverPresentationController?.sourceView = view
         present(activityViewController, animated: true, completion: nil)

@@ -51,7 +51,15 @@ extension CurrencyCell: UITextFieldDelegate {
         return allowedCharacterSet.isSuperset(of: replacementStringCharacterSet)
     }
     
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        textField.layer.borderWidth = 1.5
+        textField.layer.borderColor = UIColor.blue.cgColor
+        textField.layer.cornerRadius = 5.0
+    }
+    
     func textFieldDidEndEditing(_ textField: UITextField) {
         textField.resignFirstResponder()
+        textField.layer.borderWidth = 0.0
+        textField.layer.cornerRadius = 5.0
     }
 }

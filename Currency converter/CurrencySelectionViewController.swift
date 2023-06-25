@@ -27,18 +27,26 @@ class CurrencySelectionViewController: UIViewController, UITableViewDelegate, UI
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return currencies.count
     }
-
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CurrencySelection", for: indexPath)
         let currency = currencies[indexPath.row]
-        cell.textLabel?.text = currency.ccy
+        if let fullName = currencyFullNameMap[currency.ccy] {
+            cell.textLabel?.text = "\(currency.ccy) - \(fullName)"
+        } else {
+            cell.textLabel?.text = currency.ccy
+        }
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedCurrency = currencies[indexPath.row]
-        print("Выбранная валюта: \(selectedCurrency.ccy)")
         delegate?.currencySelectionViewController(self, didSelectCurrency: selectedCurrency)
         self.navigationController?.popViewController(animated: true)
     }
+    
+    let currencyFullNameMap: [String: String] = [
+        "EUR": "EURO",
+        "USD": "US Dollar"
+    ]
 }

@@ -28,8 +28,7 @@ class CurrencyAPI {
         }
 
         URLSession.shared.dataTask(with: url) { [weak self] (data, response, error) in
-            if let error = error {
-                print("Error fetching currency rates:", error)
+            if error != nil {
                 DispatchQueue.main.async {
                     completion(nil)
                 }
@@ -52,7 +51,6 @@ class CurrencyAPI {
                     }
                 }
             } catch {
-                print("Error decoding currency rates:", error)
                 DispatchQueue.main.async {
                     completion(nil)
                 }
@@ -75,14 +73,12 @@ class CurrencyAPI {
             do {
                 try context.execute(deleteRequest)
             } catch {
-                print("Error deleting currency rates from CoreData:", error)
                 completion()
                 return
             }
 
             for currency in currencies {
                 guard let purchaseRate = currency.purchaseRate, let saleRate = currency.saleRate else {
-                    print("No buy or sell rate for \(currency.currency), not saving this currency.")
                     continue
                 }
                 
@@ -96,12 +92,11 @@ class CurrencyAPI {
             
             do {
                 try context.save()
-                print("Currency rates saved successfully (from API)")
                 completion()
             } catch {
-                print("Error saving currency rates to CoreData:", error)
                 completion()
             }
         }
     }
 }
+

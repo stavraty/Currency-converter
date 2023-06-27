@@ -26,9 +26,9 @@ class CurrencySelectionViewController: UIViewController, UITableViewDelegate, UI
         
         searchBar.delegate = self
         
-        currencies.sort { $0.ccy < $1.ccy }
+        currencies.sort { $0.currency < $1.currency }
         
-        let groupedCurrencies = Dictionary(grouping: currencies, by: { String($0.ccy.prefix(1)) })
+        let groupedCurrencies = Dictionary(grouping: currencies, by: { String($0.currency.prefix(1)) })
         sectionTitles = [String](groupedCurrencies.keys).sorted()
         sortedCurrencies = sectionTitles.map { groupedCurrencies[$0] ?? [] }
         
@@ -51,10 +51,10 @@ class CurrencySelectionViewController: UIViewController, UITableViewDelegate, UI
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CurrencySelection", for: indexPath)
         let currency = sortedCurrencies[indexPath.section][indexPath.row]
-        if let fullName = currencyFullNameMap[currency.ccy] {
-            cell.textLabel?.text = "\(currency.ccy) - \(fullName)"
+        if let fullName = currencyFullNameMap[currency.currency] {
+            cell.textLabel?.text = "\(currency.currency) - \(fullName)"
         } else {
-            cell.textLabel?.text = currency.ccy
+            cell.textLabel?.text = currency.currency
         }
         return cell
     }
@@ -66,20 +66,39 @@ class CurrencySelectionViewController: UIViewController, UITableViewDelegate, UI
     }
     
     let currencyFullNameMap: [String: String] = [
+        "AUD": "Australian Dollar",
+        "AZN": "Azerbaijanian Manat",
+        "BYN": "Belarussian Ruble",
+        "CAD": "Canadian Dollar",
+        "CHF": "Swiss Franc",
+        "CNY": "Yuan Renminbi",
+        "CZK": "Czech Koruna",
+        "DKK": "Danish Krone",
         "EUR": "EURO",
-        "USD": "US Dollar"
+        "GBP": "Pound Sterling",
+        "GEL": "Lari",
+        "ILS": "New Israeli Sheqel",
+        "KZT": "Tenge",
+        "NOK": "Norwegian Krone",
+        "PLN": "Zloty",
+        "SEK": "Swedish Krona",
+        "TMT": "Turkmenistan New Manat",
+        "UAH": "Hryvnia",
+        "USD": "US Dollar",
+        "UZS": "Uzbekistan Sum",
+        "XAU": "Gold"
     ]
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText.isEmpty {
 
-            let groupedCurrencies = Dictionary(grouping: currencies, by: { String($0.ccy.prefix(1)) })
+            let groupedCurrencies = Dictionary(grouping: currencies, by: { String($0.currency.prefix(1)) })
             sectionTitles = [String](groupedCurrencies.keys).sorted()
             sortedCurrencies = sectionTitles.map { groupedCurrencies[$0] ?? [] }
         } else {
 
-            let filteredCurrencies = currencies.filter { $0.ccy.contains(searchText) }
-            let groupedCurrencies = Dictionary(grouping: filteredCurrencies, by: { String($0.ccy.prefix(1)) })
+            let filteredCurrencies = currencies.filter { $0.currency.contains(searchText) }
+            let groupedCurrencies = Dictionary(grouping: filteredCurrencies, by: { String($0.currency.prefix(1)) })
             sectionTitles = [String](groupedCurrencies.keys).sorted()
             sortedCurrencies = sectionTitles.map { groupedCurrencies[$0] ?? [] }
         }

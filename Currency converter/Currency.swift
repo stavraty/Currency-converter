@@ -7,10 +7,20 @@
 
 import Foundation
 
+struct APIResponse: Codable {
+    let date: String
+    let bank: String
+    let baseCurrency: Int
+    let baseCurrencyLit: String
+    let exchangeRate: [Currency]
+}
+
 struct Currency: Codable {
-    let ccy: String
-    let base_ccy: String
-    let buy: String
-    let sale: String
+    let baseCurrency: String
+    let currency: String
+    let saleRateNB: Double
+    let purchaseRateNB: Double
+    let saleRate: Double?
+    let purchaseRate: Double?
     let timestamp: String?
 }

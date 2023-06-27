@@ -42,7 +42,7 @@ class CurrencyRepository {
         let fetchRequest: NSFetchRequest<CurrencyRate> = CurrencyRate.fetchRequest()
         do {
             let result = try context.fetch(fetchRequest)
-            let currencyRates = result.map { Currency(ccy: $0.ccy ?? "", base_ccy: $0.base_ccy ?? "", buy: $0.buy ?? "", sale: $0.sale ?? "", timestamp: $0.timestamp ?? String()) }
+            let currencyRates = result.map { Currency(baseCurrency: $0.baseCurrency ?? "", currency: $0.currency ?? "", saleRateNB: $0.saleRateNB , purchaseRateNB: $0.purchaseRateNB, saleRate: $0.saleRate , purchaseRate: $0.purchaseRate , timestamp: $0.timestamp ?? String()) }
             return currencyRates
         } catch let error as NSError {
             print("Failed to fetch currency rates: \(error)")
@@ -50,14 +50,19 @@ class CurrencyRepository {
         }
     }
     
-    func saveCurrencyRate(baseCurrencyCode: String, currencyCode: String, buyRate: String, sellRate: String, timestamp: String) {
+    func saveCurrencyRate(baseCurrencyCode: String, currencyCode: String, buyRate: Double?, sellRate: Double?, timestamp: String) {
+        guard let buyRate = buyRate, let sellRate = sellRate else {
+            print("No buy or sell rate for \(currencyCode), not saving this currency.")
+            return
+        }
+        
         if let entity = NSEntityDescription.entity(forEntityName: "CurrencyRate", in: context) {
             let currencyRate = NSManagedObject(entity: entity, insertInto: context)
             
-            currencyRate.setValue(baseCurrencyCode, forKey: "base_ccy")
-            currencyRate.setValue(currencyCode, forKey: "ccy")
-            currencyRate.setValue(buyRate, forKey: "buy")
-            currencyRate.setValue(sellRate, forKey: "sale")
+            currencyRate.setValue(baseCurrencyCode, forKey: "baseCurrency")
+            currencyRate.setValue(currencyCode, forKey: "currency")
+            currencyRate.setValue(sellRate, forKey: "saleRate")
+            currencyRate.setValue(buyRate, forKey: "purchaseRate")
             currencyRate.setValue(timestamp, forKey: "timestamp")
             
             do {

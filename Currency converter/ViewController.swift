@@ -62,7 +62,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
 
     private func handleSelectedCurrency() {
         if let currency = selectedCurrency {
-            if !selectedCurrencies.contains(where: { $0.ccy == currency.ccy }) {
+            if !selectedCurrencies.contains(where: { $0.currency == currency.currency }) {
                 selectedCurrencies.append(currency)
                 selectedCurrency = nil
                 DispatchQueue.main.async {
@@ -127,7 +127,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             cell.currencyButton.setTitle("USD", for: .normal)
         } else {
             let currency = selectedCurrencies[indexPath.row - 2]
-            cell.currencyButton.setTitle(currency.ccy, for: .normal)
+            cell.currencyButton.setTitle(currency.currency, for: .normal)
         }
         cell.currencyAmountTextField.text = "0"
         cell.currencyAmountTextField.tag = indexPath.row + 100
@@ -146,12 +146,12 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return indexPath.row == 2
+        return indexPath.row > 1
     }
-    
+
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete && indexPath.row == 2 {
-            selectedCurrencies.remove(at: 0)
+        if editingStyle == .delete && indexPath.row > 1 {
+            selectedCurrencies.remove(at: indexPath.row - 2)
             tableView.deleteRows(at: [indexPath], with: .left)
         }
     }
@@ -232,7 +232,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                 self.currencyRepository?.deleteAllCurrencyRates()
                 
                 for currency in currencies {
-                    self.currencyRepository?.saveCurrencyRate(baseCurrencyCode: currency.base_ccy, currencyCode: currency.ccy, buyRate: currency.buy, sellRate: currency.sale, timestamp: self.getCurrentTimestamp())
+                    self.currencyRepository?.saveCurrencyRate(baseCurrencyCode: currency.baseCurrency, currencyCode: currency.currency, buyRate: currency.purchaseRate, sellRate: currency.saleRate, timestamp: self.getCurrentTimestamp())
                 }
                 
                 DispatchQueue.main.async {
@@ -253,7 +253,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             for row in 0..<currencyTableView.numberOfRows(inSection: section) {
                 if let cell = currencyTableView.cellForRow(at: IndexPath(row: row, section: section)) as? CurrencyCell {
                     
-                    if cell.currencyButton.currentTitle == currency.ccy {
+                    if cell.currencyButton.currentTitle == currency.currency {
                         return cell
                     }
                 }
@@ -267,7 +267,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             self.currencies = currencies
             
             for currency in currencies {
-                self.currencyRepository?.saveCurrencyRate(baseCurrencyCode: currency.base_ccy, currencyCode: currency.ccy, buyRate: currency.buy, sellRate: currency.sale, timestamp: self.getCurrentTimestamp())
+                self.currencyRepository?.saveCurrencyRate(baseCurrencyCode: currency.baseCurrency, currencyCode: currency.currency, buyRate: currency.purchaseRate, sellRate: currency.saleRate, timestamp: self.getCurrentTimestamp())
             }
             
             DispatchQueue.main.async {
@@ -284,34 +284,26 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         var targetRate: Double = 1.0
         
         for currency in currencies {
-            if currency.ccy == sourceCurrency {
+            if currency.currency == sourceCurrency {
                 if useBuyRate {
-                    if let buyRate = Double(currency.buy) {
-                        sourceRate = buyRate
-                    } else {
-                        return 0.0
+                    if let purchaseRate = currency.purchaseRate {
+                        sourceRate = purchaseRate
                     }
                 } else {
-                    if let saleRate = Double(currency.sale) {
+                    if let saleRate = currency.saleRate {
                         sourceRate = saleRate
-                    } else {
-                        return 0.0
                     }
                 }
             }
             
-            if currency.ccy == targetCurrency {
+            if currency.currency == targetCurrency {
                 if useBuyRate {
-                    if let buyRate = Double(currency.buy) {
-                        targetRate = buyRate
-                    } else {
-                        return 0.0
+                    if let purchaseRate = currency.purchaseRate {
+                        targetRate = purchaseRate
                     }
                 } else {
-                    if let saleRate = Double(currency.sale) {
+                    if let saleRate = currency.saleRate {
                         targetRate = saleRate
-                    } else {
-                        return 0.0
                     }
                 }
             }
@@ -320,9 +312,9 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         let convertedAmount = amount * (1 / targetRate) * sourceRate
         return convertedAmount
     }
-    
+
     func currencySelectionViewController(_ viewController: CurrencySelectionViewController, didSelectCurrency currency: Currency) {
-        if currency.ccy == "USD" {
+        if currency.currency == "USD" {
             let secondRowIndexPath = IndexPath(row: 1, section: 0)
             if let secondCell = currencyTableView.cellForRow(at: secondRowIndexPath) as? CurrencyCell,
                let currentCurrency = secondCell.currencyButton.currentTitle,
@@ -331,7 +323,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             }
         }
         
-        if selectedCurrencies.contains(where: { $0.ccy == currency.ccy }) {
+        if selectedCurrencies.contains(where: { $0.currency == currency.currency }) {
             return
         }
         self.selectedCurrencies.append(currency)

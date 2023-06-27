@@ -14,10 +14,14 @@ protocol CurrencyAPIDelegate: AnyObject {
 }
 
 class CurrencyAPI {
-    private let baseURL = "https://api.privatbank.ua/p24api/pubinfo?exchange&json&coursid=11"
+
     weak var delegate: CurrencyAPIDelegate?
     
     func fetchCurrencyRates(completion: @escaping ([Currency]?) -> Void) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM.yyyy"
+        let currentDate = dateFormatter.string(from: Date())
+        let baseURL = "https://api.privatbank.ua/p24api/exchange_rates?json&date=\(currentDate)"
         guard let url = URL(string: baseURL) else {
             completion(nil)
             return
@@ -40,8 +44,8 @@ class CurrencyAPI {
             }
 
             do {
-                let currencies = try JSONDecoder().decode([Currency].self, from: data)
-                
+                let response = try JSONDecoder().decode(APIResponse.self, from: data)
+                let currencies = response.exchangeRate.map { Currency(baseCurrency: $0.baseCurrency, currency: $0.currency , saleRateNB: $0.saleRateNB , purchaseRateNB: $0.purchaseRateNB, saleRate: $0.saleRate , purchaseRate: $0.purchaseRate, timestamp: response.date) }
                 self?.saveCurrenciesToCoreData(currencies) {
                     DispatchQueue.main.async {
                         completion(currencies)
@@ -55,7 +59,7 @@ class CurrencyAPI {
             }
         }.resume()
     }
-    
+
     private func saveCurrenciesToCoreData(_ currencies: [Currency], completion: @escaping () -> Void) {
         DispatchQueue.main.async {
             guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
@@ -77,11 +81,16 @@ class CurrencyAPI {
             }
 
             for currency in currencies {
+                guard let purchaseRate = currency.purchaseRate, let saleRate = currency.saleRate else {
+                    print("No buy or sell rate for \(currency.currency), not saving this currency.")
+                    continue
+                }
+                
                 let currencyRate = CurrencyRate(context: context)
-                currencyRate.base_ccy = currency.base_ccy
-                currencyRate.ccy = currency.ccy
-                currencyRate.buy = currency.buy
-                currencyRate.sale = currency.sale
+                currencyRate.baseCurrency = currency.baseCurrency
+                currencyRate.currency = currency.currency
+                currencyRate.purchaseRate = purchaseRate
+                currencyRate.saleRate = saleRate
                 currencyRate.timestamp = currency.timestamp ?? ""
             }
             

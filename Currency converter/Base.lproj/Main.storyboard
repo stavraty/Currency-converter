@@ -375,6 +375,7 @@
                                         <exclude reference="mcf-Lq-zzn"/>
                                         <exclude reference="oZC-pf-d78"/>
                                         <exclude reference="00U-uV-egx"/>
+                                        <exclude reference="9cy-Lb-0p1"/>
                                         <exclude reference="BU4-jz-wqC"/>
                                         <exclude reference="RZD-Lz-eH9"/>
                                         <exclude reference="TQo-2b-QrK"/>
@@ -386,7 +387,6 @@
                                         <exclude reference="lWs-vE-DRK"/>
                                         <exclude reference="ryg-Wb-I95"/>
                                         <exclude reference="s1i-57-gCa"/>
-                                        <exclude reference="9cy-Lb-0p1"/>
                                         <exclude reference="GXp-jW-bED"/>
                                         <exclude reference="dQr-FC-ZJx"/>
                                         <exclude reference="eYh-HA-vEL"/>
@@ -430,11 +430,11 @@
                                         <include reference="Fki-zj-XlN"/>
                                         <include reference="br7-K8-5Yw"/>
                                         <include reference="mcf-Lq-zzn"/>
+                                        <include reference="9cy-Lb-0p1"/>
                                         <include reference="RZD-Lz-eH9"/>
                                         <include reference="VyW-zV-g4k"/>
                                         <include reference="dD0-2W-UMY"/>
                                         <include reference="hRM-ic-vnV"/>
-                                        <include reference="9cy-Lb-0p1"/>
                                         <include reference="Z8q-3A-KY9"/>
                                         <include reference="o56-sn-IGl"/>
                                     </mask>
@@ -678,17 +678,13 @@
                     </view>
                     <navigationItem key="navigationItem" id="m5s-SA-MVH"/>
                     <connections>
-                        <outlet property="addCurrencyButton" destination="f2V-26-CYx" id="2P5-qu-YQJ"/>
                         <outlet property="bodyView" destination="7Vs-zi-KeK" id="bp6-0R-khb"/>
                         <outlet property="currencyTableView" destination="lL2-Zd-E9D" id="He5-oI-WdW"/>
                         <outlet property="firstBackgroundView" destination="kdM-QD-HKP" id="e1n-zw-6r5"/>
-                        <outlet property="headerBackgroundView" destination="zGK-yz-f9f" id="Z8b-9a-uLt"/>
                         <outlet property="secondBackgroundView" destination="b3W-EA-1qk" id="Qsg-cV-NGQ"/>
                         <outlet property="sellBuySegmentedControl" destination="sA2-t9-LDh" id="H4l-I3-Nic"/>
-                        <outlet property="shareButton" destination="gvz-EE-7Ty" id="xoI-TE-hv2"/>
                         <outlet property="thirdBackgroundView" destination="8wi-9L-rOb" id="L7K-1Z-FnZ"/>
                         <outlet property="updateDataLabel" destination="lcQ-3F-jcX" id="IL5-8m-CYI"/>
-                        <outlet property="updateTextLabel" destination="bjK-Y5-INR" id="4nD-7U-ZhM"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -698,7 +694,7 @@
         <!--Currency-->
         <scene sceneID="3xV-o6-zDL">
             <objects>
-                <viewController storyboardIdentifier="CurrencySelectionViewController" id="U2a-1k-hjv" customClass="CurrencySelectionViewController" customModule="Currency_converter" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="CurrencyListViewController" id="U2a-1k-hjv" customClass="CurrencyListViewController" customModule="Currency_converter" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="m8I-rg-aW5">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

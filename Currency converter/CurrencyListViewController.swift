@@ -7,16 +7,16 @@
 
 import UIKit
 
-protocol CurrencySelectionViewControllerDelegate: AnyObject {
-    func currencySelectionViewController(_ viewController: CurrencySelectionViewController, didSelectCurrency currency: Currency)
+protocol CurrencyListViewControllerDelegate: AnyObject {
+    func currencyListViewController(_ viewController: CurrencyListViewController, didSelectCurrency currency: Currency)
 }
 
-class CurrencySelectionViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
+class CurrencyListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
     
     @IBOutlet weak var currencyTableView: UITableView!
     @IBOutlet weak var searchBar: UISearchBar!
     
-    weak var delegate: CurrencySelectionViewControllerDelegate?
+    weak var delegate: CurrencyListViewControllerDelegate?
     var currencies: [Currency] = []
     var sortedCurrencies = [[Currency]]()
     var sectionTitles = [String]()
@@ -61,7 +61,7 @@ class CurrencySelectionViewController: UIViewController, UITableViewDelegate, UI
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedCurrency = sortedCurrencies[indexPath.section][indexPath.row]
-        delegate?.currencySelectionViewController(self, didSelectCurrency: selectedCurrency)
+        delegate?.currencyListViewController(self, didSelectCurrency: selectedCurrency)
         self.navigationController?.popViewController(animated: true)
     }
     

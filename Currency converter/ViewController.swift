@@ -8,41 +8,40 @@
 import UIKit
 import CoreData
 
-class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, CurrencyAPIDelegate, UITextFieldDelegate, CurrencySelectionViewControllerDelegate, CurrencyCellDelegate {
+class ViewController: UIViewController {
     
-    @IBOutlet weak var headerBackgroundView: UIView!
+    enum Constants {
+        static let currencyCellIdentifier = "currencyCell"
+        static let defaultCurrencyAmount = "0"
+        static let defaultCurrencyTitles = ["UAH", "USD"]
+    }
+    
     @IBOutlet weak var firstBackgroundView: UIView!
     @IBOutlet weak var secondBackgroundView: UIView!
     @IBOutlet weak var thirdBackgroundView: UIView!
     @IBOutlet weak var bodyView: UIView!
     @IBOutlet weak var sellBuySegmentedControl: UISegmentedControl!
     @IBOutlet weak var currencyTableView: UITableView!
-    @IBOutlet weak var addCurrencyButton: UIButton!
-    @IBOutlet weak var shareButton: UIButton!
-    @IBOutlet weak var updateTextLabel: UILabel!
     @IBOutlet weak var updateDataLabel: UILabel!
     
-    var appDelegate: AppDelegate?
-    var currencyRepository: CurrencyRepository?
-    let currencyAPI = CurrencyAPI()
-    var currencies: [Currency] = []
-    var firstCell: CurrencyCell?
-    var currencyCell = "currencyCell"
     var isUsingBuyRate: Bool = false
-    var amount: Double = 0.0
     var selectedCurrency: Currency?
-    var selectedCurrencies: [Currency] = []
-    var lastEditedIndexPath: IndexPath?
+    
+    private var appDelegate: AppDelegate?
+    private var currencyRepository: CurrencyRepository?
+    private let currencyAPI = CurrencyAPI()
+    private var currencies: [Currency] = []
+    private var firstCell: CurrencyCell?
+    private var currencyCell = "currencyCell"
+    private var amount: Double = 0.0
+    private var selectedCurrencies: [Currency] = []
+    private var lastEditedIndexPath: IndexPath?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupBackgroundView()
-        setupBodyView()
-        setupGestures()
+        setupUI()
         setupRepositories()
-        setupTableView()
-        setupBackButton()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -51,7 +50,32 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         fetchData()
         handleSelectedCurrency()
     }
-
+    
+    func currencyCell(_ cell: CurrencyCell, didChangeText text: String?) {
+        guard let text = text, let _ = Double(text) else { return }
+        lastEditedIndexPath = currencyTableView.indexPath(for: cell)
+        convertCurrencyAndUpdateRows(from: lastEditedIndexPath)
+    }
+    
+    func didFinishFetchingCurrencyRates(_ currencies: [Currency]?) {
+        guard let currencies = currencies else {
+            self.showAlert(title: "Error", message: "Failed to fetch currency rates")
+            return
+        }
+        
+        self.currencies = currencies
+        
+        for currency in currencies {
+            self.currencyRepository?.saveCurrencyRate(baseCurrencyCode: currency.baseCurrency, currencyCode: currency.currency, buyRate: currency.purchaseRate, sellRate: currency.saleRate, timestamp: self.getCurrentTimestamp())
+        }
+        
+        DispatchQueue.main.async {
+            let currencyRates = self.currencyRepository?.getCurrencyRates() ?? []
+            self.currencies = currencyRates
+            self.currencyTableView.reloadData()
+        }
+    }
+    
     private func fetchData() {
         if currencyRepository?.shouldFetchCurrencyRates() ?? false {
             fetchCurrencyRatesFromAPI()
@@ -59,7 +83,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             fetchCurrencyRatesFromCoreData()
         }
     }
-
+    
     private func handleSelectedCurrency() {
         if let currency = selectedCurrency {
             if !selectedCurrencies.contains(where: { $0.currency == currency.currency }) {
@@ -72,96 +96,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }
     }
     
-    func setupBackgroundView() {
-        firstBackgroundView.layer.cornerRadius = firstBackgroundView.frame.height / 2
-        secondBackgroundView.layer.cornerRadius = secondBackgroundView.frame.height / 2
-        thirdBackgroundView.layer.cornerRadius = thirdBackgroundView.frame.height / 2
-    }
-    
-    func setupBodyView() {
-        bodyView.layer.borderWidth = 0.2
-        bodyView.layer.borderColor = UIColor.lightGray.cgColor
-        bodyView.layer.cornerRadius = 10
-        bodyView.layer.masksToBounds = false
-        bodyView.layer.shadowColor = UIColor.darkGray.cgColor
-        bodyView.layer.shadowOffset = CGSize(width: 0, height: 5)
-        bodyView.layer.shadowOpacity = 0.5
-        bodyView.layer.shadowRadius = 3
-    }
-    
-    func setupGestures() {
-        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-        tap.cancelsTouchesInView = false
-        view.addGestureRecognizer(tap)
-    }
-
-    func setupRepositories() {
-        appDelegate = UIApplication.shared.delegate as? AppDelegate
-        currencyRepository = CurrencyRepository(context: (appDelegate?.persistentContainer.viewContext)!)
-        currencyRepository = appDelegate?.currencyRepository
-        currencyAPI.delegate = self
-    }
-
-    func setupTableView() {
-        currencyTableView.dataSource = self
-        currencyTableView.delegate = self
-        currencyTableView.register(UINib(nibName: "CurrencyCell", bundle: nil), forCellReuseIdentifier: "currencyCell")
-    }
-
-    func setupBackButton() {
-        let backItem = UIBarButtonItem()
-        backItem.title = "Converter"
-        navigationItem.backBarButtonItem = backItem
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return selectedCurrencies.count + 2
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "currencyCell", for: indexPath) as! CurrencyCell
-        
-        if indexPath.row == 0 {
-            cell.currencyButton.setTitle("UAH", for: .normal)
-        } else if indexPath.row == 1 {
-            cell.currencyButton.setTitle("USD", for: .normal)
-        } else {
-            let currency = selectedCurrencies[indexPath.row - 2]
-            cell.currencyButton.setTitle(currency.currency, for: .normal)
-        }
-        cell.currencyAmountTextField.text = "0"
-        cell.currencyAmountTextField.tag = indexPath.row + 100
-        cell.currencyAmountTextField.delegate = self
-        cell.delegate = self
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
-        let secondRowIndexPath = IndexPath(row: 1, section: 0)
-        guard let secondCell = tableView.cellForRow(at: secondRowIndexPath) as? CurrencyCell else {
-            return
-        }
-        let currencyAmountTextField = secondCell.currencyAmountTextField
-    }
-    
-    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return indexPath.row > 1
-    }
-
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete && indexPath.row > 1 {
-            selectedCurrencies.remove(at: indexPath.row - 2)
-            tableView.deleteRows(at: [indexPath], with: .left)
-        }
-    }
-    
-    func currencyCell(_ cell: CurrencyCell, didChangeText text: String?) {
-        guard let text = text, let amount = Double(text) else { return }
-        lastEditedIndexPath = currencyTableView.indexPath(for: cell)
-        convertCurrencyAndUpdateRows(from: lastEditedIndexPath)
-    }
-
     private func convertCurrencyAndUpdateRows(from sourceIndexPath: IndexPath?) {
         guard let sourceIndexPath = sourceIndexPath,
               let sourceCell = currencyTableView.cellForRow(at: sourceIndexPath) as? CurrencyCell,
@@ -172,7 +106,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         }
         
         let useBuyRate = sellBuySegmentedControl.selectedSegmentIndex == 1
-
+        
         for indexPath in currencyTableView.indexPathsForVisibleRows ?? [] {
             if indexPath != sourceIndexPath {
                 guard let targetCell = currencyTableView.cellForRow(at: indexPath) as? CurrencyCell,
@@ -215,35 +149,38 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     private func fetchCurrencyRatesFromCoreData() {
-        if let currencyRates = currencyRepository?.getCurrencyRates() {
-            currencies = currencyRates
-            currencies = currencyRepository?.getCurrencyRates() ?? []
-            currencyTableView.reloadData()
-            
-            if let timestamp = currencyRates.first?.timestamp {
-                updateDataLabel(with: timestamp)
-            }
+        let currencyRates = currencyRepository?.getCurrencyRates() ?? []
+        currencies = currencyRates
+        currencyTableView.reloadData()
+
+        if let timestamp = currencyRates.first?.timestamp {
+            updateDataLabel(with: timestamp)
         }
     }
     
     private func fetchCurrencyRatesFromAPI() {
         currencyAPI.fetchCurrencyRates { currencies in
-            if let currencies = currencies {
-                self.currencyRepository?.deleteAllCurrencyRates()
-                
-                for currency in currencies {
-                    self.currencyRepository?.saveCurrencyRate(baseCurrencyCode: currency.baseCurrency, currencyCode: currency.currency, buyRate: currency.purchaseRate, sellRate: currency.saleRate, timestamp: self.getCurrentTimestamp())
+            guard let currencies = currencies else {
+                self.showAlert(title: "Error", message: "Failed to fetch currency rates from API.")
+                return
+            }
+            self.currencyRepository?.deleteAllCurrencyRates()
+
+            for currency in currencies {
+                self.currencyRepository?.saveCurrencyRate(baseCurrencyCode: currency.baseCurrency, currencyCode: currency.currency, buyRate: currency.purchaseRate, sellRate: currency.saleRate, timestamp: self.getCurrentTimestamp())
+            }
+
+            DispatchQueue.main.async {
+                guard let currencyRates = self.currencyRepository?.getCurrencyRates(), !currencyRates.isEmpty else {
+                    self.showAlert(title: "Error", message: "Failed to fetch currency rates from local storage.")
+                    return
                 }
-                
-                DispatchQueue.main.async {
-                    if let currencyRates = self.currencyRepository?.getCurrencyRates() {
-                        self.currencies = currencyRates
-                        self.currencyTableView.reloadData()
-                        
-                        let currentTimestamp = self.getCurrentTimestamp()
-                        self.updateDataLabel(with: currentTimestamp)
-                    }
-                }
+
+                self.currencies = currencyRates
+                self.currencyTableView.reloadData()
+
+                let currentTimestamp = self.getCurrentTimestamp()
+                self.updateDataLabel(with: currentTimestamp)
             }
         }
     }
@@ -251,84 +188,32 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     private func findCurrencyCell(for currency: Currency) -> CurrencyCell? {
         for section in 0..<currencyTableView.numberOfSections {
             for row in 0..<currencyTableView.numberOfRows(inSection: section) {
-                if let cell = currencyTableView.cellForRow(at: IndexPath(row: row, section: section)) as? CurrencyCell {
-                    
-                    if cell.currencyButton.currentTitle == currency.currency {
-                        return cell
-                    }
+                let indexPath = IndexPath(row: row, section: section)
+                guard let cell = currencyTableView.cellForRow(at: indexPath) as? CurrencyCell, cell.currencyButton.currentTitle == currency.currency else {
+                    continue
                 }
+                return cell
             }
         }
         return nil
     }
     
-    func didFinishFetchingCurrencyRates(_ currencies: [Currency]?) {
-        if let currencies = currencies {
-            self.currencies = currencies
-            
-            for currency in currencies {
-                self.currencyRepository?.saveCurrencyRate(baseCurrencyCode: currency.baseCurrency, currencyCode: currency.currency, buyRate: currency.purchaseRate, sellRate: currency.saleRate, timestamp: self.getCurrentTimestamp())
-            }
-            
-            DispatchQueue.main.async {
-                if let currencyRates = self.currencyRepository?.getCurrencyRates() {
-                    self.currencies = currencyRates
-                    self.currencyTableView.reloadData()
-                }
-            }
-        }
-    }
-    
     private func convertCurrency(_ amount: Double, from sourceCurrency: String, to targetCurrency: String, useBuyRate: Bool) -> Double {
-        var sourceRate: Double = 1.0
-        var targetRate: Double = 1.0
-        
-        for currency in currencies {
-            if currency.currency == sourceCurrency {
-                if useBuyRate {
-                    if let purchaseRate = currency.purchaseRate {
-                        sourceRate = purchaseRate
-                    }
-                } else {
-                    if let saleRate = currency.saleRate {
-                        sourceRate = saleRate
-                    }
-                }
-            }
-            
-            if currency.currency == targetCurrency {
-                if useBuyRate {
-                    if let purchaseRate = currency.purchaseRate {
-                        targetRate = purchaseRate
-                    }
-                } else {
-                    if let saleRate = currency.saleRate {
-                        targetRate = saleRate
-                    }
-                }
-            }
-        }
+        let sourceCurrencyData = currencies.first(where: { $0.currency == sourceCurrency })
+        let targetCurrencyData = currencies.first(where: { $0.currency == targetCurrency })
+
+        let sourceRate = useBuyRate ? sourceCurrencyData?.purchaseRate ?? 1.0 : sourceCurrencyData?.saleRate ?? 1.0
+        let targetRate = useBuyRate ? targetCurrencyData?.purchaseRate ?? 1.0 : targetCurrencyData?.saleRate ?? 1.0
         
         let convertedAmount = amount * (1 / targetRate) * sourceRate
         return convertedAmount
     }
-
-    func currencySelectionViewController(_ viewController: CurrencySelectionViewController, didSelectCurrency currency: Currency) {
-        if currency.currency == "USD" {
-            let secondRowIndexPath = IndexPath(row: 1, section: 0)
-            if let secondCell = currencyTableView.cellForRow(at: secondRowIndexPath) as? CurrencyCell,
-               let currentCurrency = secondCell.currencyButton.currentTitle,
-               currentCurrency == "USD" {
-                return
-            }
-        }
-        
-        if selectedCurrencies.contains(where: { $0.currency == currency.currency }) {
-            return
-        }
-        self.selectedCurrencies.append(currency)
+    
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         DispatchQueue.main.async {
-            self.currencyTableView.reloadData()
+            self.present(alert, animated: true, completion: nil)
         }
     }
     
@@ -338,7 +223,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     @IBAction func addCurrencyButtonTapped(_ sender: Any) {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let currencySelectionVC = storyboard.instantiateViewController(withIdentifier: "CurrencySelectionViewController") as! CurrencySelectionViewController
+        let currencySelectionVC = storyboard.instantiateViewController(withIdentifier: "CurrencyListViewController") as! CurrencyListViewController
         currencySelectionVC.currencies = self.currencies
         currencySelectionVC.delegate = self
         self.navigationController?.pushViewController(currencySelectionVC, animated: true)
@@ -360,14 +245,131 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         if let lastUpdatedDateString = currencyRepository?.getLastUpdateTimestamp() {
             shareText += "\nLast updated: \(lastUpdatedDateString)"
         }
-
+        
         let activityViewController = UIActivityViewController(activityItems: [shareText], applicationActivities: nil)
         activityViewController.popoverPresentationController?.sourceView = view
         present(activityViewController, animated: true, completion: nil)
     }
     
     @IBAction func sellBuySegmentChanged(_ sender: Any) {
-        let useBuyRate = (sender as AnyObject).selectedSegmentIndex == 1
         convertCurrencyAndUpdateRows(from: lastEditedIndexPath)
+    }
+}
+
+extension ViewController {
+    func setupUI() {
+        setupBackgroundView()
+        setupBodyView()
+        setupGestures()
+        setupTableView()
+        setupBackButton()
+    }
+    
+    private func setupBackgroundView() {
+        firstBackgroundView.layer.cornerRadius = firstBackgroundView.frame.height / 2
+        secondBackgroundView.layer.cornerRadius = secondBackgroundView.frame.height / 2
+        thirdBackgroundView.layer.cornerRadius = thirdBackgroundView.frame.height / 2
+    }
+    
+    private func setupBodyView() {
+        bodyView.layer.borderWidth = 0.2
+        bodyView.layer.borderColor = UIColor.lightGray.cgColor
+        bodyView.layer.cornerRadius = 10
+        bodyView.layer.masksToBounds = false
+        bodyView.layer.shadowColor = UIColor.darkGray.cgColor
+        bodyView.layer.shadowOffset = CGSize(width: 0, height: 5)
+        bodyView.layer.shadowOpacity = 0.5
+        bodyView.layer.shadowRadius = 3
+    }
+    
+    private func setupGestures() {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+    }
+    
+    private func setupTableView() {
+        currencyTableView.dataSource = self
+        currencyTableView.delegate = self
+        currencyTableView.register(UINib(nibName: "CurrencyCell", bundle: nil), forCellReuseIdentifier: "currencyCell")
+    }
+    
+    private func setupBackButton() {
+        let backItem = UIBarButtonItem()
+        backItem.title = "Converter"
+        navigationItem.backBarButtonItem = backItem
+    }
+}
+
+extension ViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return indexPath.row > 1
+    }
+}
+
+extension ViewController: UITableViewDataSource, UITextFieldDelegate, CurrencyCellDelegate {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return selectedCurrencies.count + Constants.defaultCurrencyTitles.count
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: Constants.currencyCellIdentifier, for: indexPath) as? CurrencyCell else {
+            return UITableViewCell()
+        }
+
+        switch indexPath.row {
+        case 0..<Constants.defaultCurrencyTitles.count:
+            cell.currencyButton.setTitle(Constants.defaultCurrencyTitles[indexPath.row], for: .normal)
+        default:
+            let currency = selectedCurrencies[indexPath.row - Constants.defaultCurrencyTitles.count]
+            cell.currencyButton.setTitle(currency.currency, for: .normal)
+        }
+
+        cell.currencyAmountTextField.text = Constants.defaultCurrencyAmount
+        cell.currencyAmountTextField.tag = indexPath.row + 100
+        cell.currencyAmountTextField.delegate = self
+        cell.delegate = self
+
+        return cell
+    }
+
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete && indexPath.row >= Constants.defaultCurrencyTitles.count {
+            selectedCurrencies.remove(at: indexPath.row - Constants.defaultCurrencyTitles.count)
+            tableView.deleteRows(at: [indexPath], with: .left)
+        }
+    }
+}
+
+extension ViewController: CurrencyListViewControllerDelegate {
+    func currencyListViewController(_ viewController: CurrencyListViewController, didSelectCurrency currency: Currency) {
+        if currency.currency == Constants.defaultCurrencyTitles[1] {
+            let secondRowIndexPath = IndexPath(row: 1, section: 0)
+            if let secondCell = currencyTableView.cellForRow(at: secondRowIndexPath) as? CurrencyCell,
+               let currentCurrency = secondCell.currencyButton.currentTitle,
+               currentCurrency == Constants.defaultCurrencyTitles[1] {
+                return
+            }
+        }
+        
+        if selectedCurrencies.contains(where: { $0.currency == currency.currency }) {
+            return
+        }
+        self.selectedCurrencies.append(currency)
+        DispatchQueue.main.async {
+            self.currencyTableView.reloadData()
+        }
+    }
+}
+
+extension ViewController: CurrencyAPIDelegate {
+    private func setupRepositories() {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+        
+        let viewContext = appDelegate.persistentContainer.viewContext
+        currencyRepository = CurrencyRepository(context: viewContext)
+        currencyAPI.delegate = self
     }
 }

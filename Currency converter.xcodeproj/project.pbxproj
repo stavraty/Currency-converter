@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F08066632A1403DB003BD67B /* Currency.swift in Sources */ = {isa = PBXBuildFile; fileRef = F08066622A1403DB003BD67B /* Currency.swift */; };
+		F08066632A1403DB003BD67B /* BankExchangeRate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F08066622A1403DB003BD67B /* BankExchangeRate.swift */; };
 		F08066652A1405FF003BD67B /* CurrencyAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = F08066642A1405FF003BD67B /* CurrencyAPI.swift */; };
 		F08783E12A14DBA1005E792C /* CurrencyCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F08783DF2A14DBA1005E792C /* CurrencyCell.swift */; };
 		F08783E22A14DBA1005E792C /* CurrencyCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F08783E02A14DBA1005E792C /* CurrencyCell.xib */; };
@@ -42,7 +42,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		F08066622A1403DB003BD67B /* Currency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Currency.swift; sourceTree = "<group>"; };
+		F08066622A1403DB003BD67B /* BankExchangeRate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BankExchangeRate.swift; sourceTree = "<group>"; };
 		F08066642A1405FF003BD67B /* CurrencyAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyAPI.swift; sourceTree = "<group>"; };
 		F08783DF2A14DBA1005E792C /* CurrencyCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyCell.swift; sourceTree = "<group>"; };
 		F08783E02A14DBA1005E792C /* CurrencyCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CurrencyCell.xib; sourceTree = "<group>"; };
@@ -129,7 +129,7 @@
 				F0A93DA02A0A5B8F0061CD6A /* LaunchScreen.storyboard */,
 				F08783DC2A14CDBE005E792C /* CurrencyCells */,
 				F0A93DA32A0A5B8F0061CD6A /* Info.plist */,
-				F08066622A1403DB003BD67B /* Currency.swift */,
+				F08066622A1403DB003BD67B /* BankExchangeRate.swift */,
 				F08066642A1405FF003BD67B /* CurrencyAPI.swift */,
 				F08783E62A160918005E792C /* CurrencyRepository.swift */,
 				F0957E8E2A1BBD5600D5931D /* CurrencyDataModel.xcdatamodeld */,
@@ -286,7 +286,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F0957E902A1BBD5600D5931D /* CurrencyDataModel.xcdatamodeld in Sources */,
-				F08066632A1403DB003BD67B /* Currency.swift in Sources */,
+				F08066632A1403DB003BD67B /* BankExchangeRate.swift in Sources */,
 				F0F96D2D2A41BE5C00528AA9 /* CurrencyListViewController.swift in Sources */,
 				F08066652A1405FF003BD67B /* CurrencyAPI.swift in Sources */,
 				F0A93D9A2A0A5B8C0061CD6A /* ViewController.swift in Sources */,

@@ -43,7 +43,7 @@ class CurrencyAPI {
             }
 
             do {
-                let response = try JSONDecoder().decode(APIResponse.self, from: data)
+                let response = try JSONDecoder().decode(BankExchangeRate.self, from: data)
                 let currencies = response.exchangeRate.map { Currency(baseCurrency: $0.baseCurrency, currency: $0.currency , saleRateNB: $0.saleRateNB , purchaseRateNB: $0.purchaseRateNB, saleRate: $0.saleRate , purchaseRate: $0.purchaseRate, timestamp: response.date) }
                 self?.saveCurrenciesToCoreData(currencies) {
                     DispatchQueue.main.async {

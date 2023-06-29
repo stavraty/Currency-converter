@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct APIResponse: Codable {
+struct BankExchangeRate: Codable {
     let date: String
     let bank: String
     let baseCurrency: Int

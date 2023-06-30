@@ -325,11 +325,8 @@ extension ViewController: UITableViewDataSource, UITextFieldDelegate, CurrencyCe
             cell.currencyButton.setTitle(currency.currency, for: .normal)
         }
 
-        cell.currencyAmountTextField.text = Constants.defaultCurrencyAmount
-        cell.currencyAmountTextField.tag = indexPath.row + 100
-        cell.currencyAmountTextField.delegate = self
-        cell.delegate = self
-
+        cell.setUp(currencyAmountTF: Constants.defaultCurrencyAmount, currencyAmountTFTag: indexPath.row + 100, currencyAmountTFDelegate: self, delegate: self)
+        
         return cell
     }
 

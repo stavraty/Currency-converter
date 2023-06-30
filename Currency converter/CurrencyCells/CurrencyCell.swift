@@ -37,6 +37,18 @@ class CurrencyCell: UITableViewCell {
     @objc func currencyAmountTextFieldDidChange(_ textField: UITextField) {
         delegate?.currencyCell(self, didChangeText: textField.text)
     }
+    
+    func setUp(currencyAmountTF: String, currencyAmountTFTag: Int, currencyAmountTFDelegate: UITextFieldDelegate?, delegate: CurrencyCellDelegate?) {
+        self.currencyAmountTextField.text = currencyAmountTF
+        self.currencyAmountTextField.tag = currencyAmountTFTag
+        self.currencyAmountTextField.delegate = currencyAmountTFDelegate
+        self.delegate = delegate
+        setCurrencyButton()
+    }
+    
+    private func setCurrencyButton() {
+        
+    }
 }
 
 extension CurrencyCell: UITextFieldDelegate {

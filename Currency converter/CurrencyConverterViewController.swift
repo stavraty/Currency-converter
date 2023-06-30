@@ -8,12 +8,19 @@
 import UIKit
 import CoreData
 
-class ViewController: UIViewController {
+class CurrencyConverterViewController: UIViewController {
     
     enum Constants {
         static let currencyCellIdentifier = "currencyCell"
         static let defaultCurrencyAmount = "0"
         static let defaultCurrencyTitles = ["UAH", "USD"]
+    }
+    
+    enum AlertMessages {
+        static let errorTitle = "Error"
+        static let fetchCurrencyRatesFailure = "Failed to fetch currency rates"
+        static let fetchAPIFailure = "Failed to fetch currency rates from API."
+        static let fetchLocalStorageFailure = "Failed to fetch currency rates from local storage."
     }
     
     @IBOutlet weak var firstBackgroundView: UIView!
@@ -24,16 +31,10 @@ class ViewController: UIViewController {
     @IBOutlet weak var currencyTableView: UITableView!
     @IBOutlet weak var updateDataLabel: UILabel!
     
-    var isUsingBuyRate: Bool = false
-    var selectedCurrency: Currency?
-    
-    private var appDelegate: AppDelegate?
+    private var selectedCurrency: Currency?
     private var currencyRepository: CurrencyRepository?
-    private let currencyAPI = CurrencyAPI()
+    private var currencyAPI = CurrencyAPIService()
     private var currencies: [Currency] = []
-    private var firstCell: CurrencyCell?
-    private var currencyCell = "currencyCell"
-    private var amount: Double = 0.0
     private var selectedCurrencies: [Currency] = []
     private var lastEditedIndexPath: IndexPath?
     
@@ -51,15 +52,15 @@ class ViewController: UIViewController {
         handleSelectedCurrency()
     }
     
-    func currencyCell(_ cell: CurrencyCell, didChangeText text: String?) {
+    internal func currencyCell(_ cell: CurrencyCell, didChangeText text: String?) {
         guard let text = text, let _ = Double(text) else { return }
         lastEditedIndexPath = currencyTableView.indexPath(for: cell)
         convertCurrencyAndUpdateRows(from: lastEditedIndexPath)
     }
     
-    func didFinishFetchingCurrencyRates(_ currencies: [Currency]?) {
+    internal func didFinishFetchingCurrencyRates(_ currencies: [Currency]?) {
         guard let currencies = currencies else {
-            self.showAlert(title: "Error", message: "Failed to fetch currency rates")
+            self.showAlert(title: AlertMessages.errorTitle, message: AlertMessages.fetchCurrencyRatesFailure)
             return
         }
         
@@ -161,7 +162,7 @@ class ViewController: UIViewController {
     private func fetchCurrencyRatesFromAPI() {
         currencyAPI.fetchCurrencyRates { currencies in
             guard let currencies = currencies else {
-                self.showAlert(title: "Error", message: "Failed to fetch currency rates from API.")
+                self.showAlert(title: AlertMessages.errorTitle, message: AlertMessages.fetchAPIFailure)
                 return
             }
             self.currencyRepository?.deleteAllCurrencyRates()
@@ -172,7 +173,7 @@ class ViewController: UIViewController {
 
             DispatchQueue.main.async {
                 guard let currencyRates = self.currencyRepository?.getCurrencyRates(), !currencyRates.isEmpty else {
-                    self.showAlert(title: "Error", message: "Failed to fetch currency rates from local storage.")
+                    self.showAlert(title: AlertMessages.errorTitle, message: AlertMessages.fetchLocalStorageFailure)
                     return
                 }
 
@@ -256,7 +257,7 @@ class ViewController: UIViewController {
     }
 }
 
-extension ViewController {
+extension CurrencyConverterViewController {
     func setupUI() {
         setupBackgroundView()
         setupBodyView()
@@ -301,13 +302,13 @@ extension ViewController {
     }
 }
 
-extension ViewController: UITableViewDelegate {
+extension CurrencyConverterViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return indexPath.row > 1
     }
 }
 
-extension ViewController: UITableViewDataSource, UITextFieldDelegate, CurrencyCellDelegate {
+extension CurrencyConverterViewController: UITableViewDataSource, UITextFieldDelegate, CurrencyCellDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return selectedCurrencies.count + Constants.defaultCurrencyTitles.count
     }
@@ -338,7 +339,7 @@ extension ViewController: UITableViewDataSource, UITextFieldDelegate, CurrencyCe
     }
 }
 
-extension ViewController: CurrencyListViewControllerDelegate {
+extension CurrencyConverterViewController: CurrencyListViewControllerDelegate {
     func currencyListViewController(_ viewController: CurrencyListViewController, didSelectCurrency currency: Currency) {
         if currency.currency == Constants.defaultCurrencyTitles[1] {
             let secondRowIndexPath = IndexPath(row: 1, section: 0)
@@ -359,7 +360,7 @@ extension ViewController: CurrencyListViewControllerDelegate {
     }
 }
 
-extension ViewController: CurrencyAPIDelegate {
+extension CurrencyConverterViewController: CurrencyAPIDelegate {
     private func setupRepositories() {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             return

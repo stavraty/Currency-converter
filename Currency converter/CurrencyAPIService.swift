@@ -13,7 +13,7 @@ protocol CurrencyAPIDelegate: AnyObject {
     func didFinishFetchingCurrencyRates(_ currencies: [Currency]?)
 }
 
-class CurrencyAPI {
+struct CurrencyAPIService {
 
     weak var delegate: CurrencyAPIDelegate?
     
@@ -27,7 +27,7 @@ class CurrencyAPI {
             return
         }
 
-        URLSession.shared.dataTask(with: url) { [weak self] (data, response, error) in
+        URLSession.shared.dataTask(with: url) { (data, response, error) in
             if error != nil {
                 DispatchQueue.main.async {
                     completion(nil)
@@ -45,7 +45,7 @@ class CurrencyAPI {
             do {
                 let response = try JSONDecoder().decode(BankExchangeRate.self, from: data)
                 let currencies = response.exchangeRate.map { Currency(baseCurrency: $0.baseCurrency, currency: $0.currency , saleRateNB: $0.saleRateNB , purchaseRateNB: $0.purchaseRateNB, saleRate: $0.saleRate , purchaseRate: $0.purchaseRate, timestamp: response.date) }
-                self?.saveCurrenciesToCoreData(currencies) {
+                saveCurrenciesToCoreData(currencies) {
                     DispatchQueue.main.async {
                         completion(currencies)
                     }

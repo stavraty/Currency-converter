@@ -17,9 +17,10 @@
                 <rect key="frame" x="0.0" y="0.0" width="358" height="50"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rNM-xl-jNl">
+                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" restorationIdentifier="currencyButton" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rNM-xl-jNl">
                         <rect key="frame" x="0.0" y="8" width="97" height="34"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <accessibility key="accessibilityConfiguration" identifier="currencyButton"/>
                         <state key="normal" title="Button"/>
                         <buttonConfiguration key="configuration" style="plain" image="chevron.right" catalog="system" imagePlacement="trailing" title="UAH" imagePadding="10">
                             <color key="baseForegroundColor" red="0.0" green="0.19215686274509802" blue="0.40000000000000002" alpha="1" colorSpace="calibratedRGB"/>
@@ -28,10 +29,11 @@
                             <action selector="currencyButtonTapped:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="jL6-UY-tFF"/>
                         </connections>
                     </button>
-                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" clearsOnBeginEditing="YES" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="3lM-0d-8Ax">
+                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" restorationIdentifier="currencyTF" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" clearsOnBeginEditing="YES" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="3lM-0d-8Ax">
                         <rect key="frame" x="105" y="8" width="245" height="34"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" red="0.98039215686274506" green="0.96862745098039216" blue="0.99215686274509807" alpha="1" colorSpace="calibratedRGB"/>
+                        <accessibility key="accessibilityConfiguration" identifier="currencyTF"/>
                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                         <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation"/>
                     </textField>

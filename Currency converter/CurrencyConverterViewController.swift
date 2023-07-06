@@ -21,6 +21,7 @@ class CurrencyConverterViewController: UIViewController {
         static let fetchCurrencyRatesFailure = "Failed to fetch currency rates"
         static let fetchAPIFailure = "Failed to fetch currency rates from API."
         static let fetchLocalStorageFailure = "Failed to fetch currency rates from local storage."
+        static let fetchCurrencyRatesFromAPIFailure = "Currency API is not available."
     }
     
     @IBOutlet weak var firstBackgroundView: UIView!
@@ -33,7 +34,7 @@ class CurrencyConverterViewController: UIViewController {
     
     private var selectedCurrency: Currency?
     private var currencyRepository: CurrencyRepository?
-    private var currencyAPI = CurrencyAPIService()
+    private var currencyAPI: CurrencyAPIService?
     private var currencies: [Currency] = []
     private var selectedCurrencies: [Currency] = []
     private var lastEditedIndexPath: IndexPath?
@@ -52,13 +53,13 @@ class CurrencyConverterViewController: UIViewController {
         handleSelectedCurrency()
     }
     
-    internal func currencyCell(_ cell: CurrencyCell, didChangeText text: String?) {
+    func currencyCell(_ cell: CurrencyCell, didChangeText text: String?) {
         guard let text = text, let _ = Double(text) else { return }
         lastEditedIndexPath = currencyTableView.indexPath(for: cell)
         convertCurrencyAndUpdateRows(from: lastEditedIndexPath)
     }
     
-    internal func didFinishFetchingCurrencyRates(_ currencies: [Currency]?) {
+    func didFinishFetchingCurrencyRates(_ currencies: [Currency]?) {
         guard let currencies = currencies else {
             self.showAlert(title: AlertMessages.errorTitle, message: AlertMessages.fetchCurrencyRatesFailure)
             return
@@ -160,6 +161,11 @@ class CurrencyConverterViewController: UIViewController {
     }
     
     private func fetchCurrencyRatesFromAPI() {
+        guard let currencyAPI = self.currencyAPI else {
+            self.showAlert(title: AlertMessages.errorTitle, message: AlertMessages.fetchCurrencyRatesFromAPIFailure)
+            return
+        }
+        
         currencyAPI.fetchCurrencyRates { currencies in
             guard let currencies = currencies else {
                 self.showAlert(title: AlertMessages.errorTitle, message: AlertMessages.fetchAPIFailure)
@@ -362,12 +368,9 @@ extension CurrencyConverterViewController: CurrencyListViewControllerDelegate {
 
 extension CurrencyConverterViewController: CurrencyAPIDelegate {
     private func setupRepositories() {
-        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            return
-        }
-        
-        let viewContext = appDelegate.persistentContainer.viewContext
-        currencyRepository = CurrencyRepository(context: viewContext)
-        currencyAPI.delegate = self
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let context = appDelegate.persistentContainer.viewContext
+        currencyRepository = CurrencyRepository(context: context)
+        currencyAPI = CurrencyAPIService(currencyRepository: currencyRepository!)
     }
 }

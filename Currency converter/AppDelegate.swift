@@ -14,6 +14,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var currencyRepository: CurrencyRepository?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        if CommandLine.arguments.contains("--uitesting") {
+            // clear data for UI Testing
+            self.currencyRepository?.deleteAllCurrencyRates()
+        }
         return true
     }
     

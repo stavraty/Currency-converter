@@ -9,66 +9,45 @@ import XCTest
 @testable import Currency_converter
 
 class CurrencyRepositoryIntegrationTests: XCTestCase {
-    var crt: CurrencyRepository!
-
+    var sut: CurrencyAPIService!
+    
     override func setUp() {
         super.setUp()
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let context = appDelegate.persistentContainer.viewContext
-        crt = CurrencyRepository(context: context)
+        let currencyRepository = CurrencyRepository(context: context)
+        sut = CurrencyAPIService(currencyRepository: currencyRepository)
     }
 
     override func tearDown() {
-        crt = nil
+        sut = nil
         super.tearDown()
     }
 
     func testFetchingDataFromServer() {
-        crt.deleteAllCurrencyRates()
-
-        let urlString = "https://api.privatbank.ua/p24api/exchange_rates?json&date=03.07.2023"
-        guard let url = URL(string: urlString) else {
-            XCTFail("Invalid URL.")
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd.MM.yyyy"
+        guard let specificDate = dateFormatter.date(from: "03.07.2023") else {
+            XCTFail("Invalid Date.")
             return
         }
 
         let expectation = XCTestExpectation(description: "Currency rates data fetched.")
 
-        URLSession.shared.dataTask(with: url) { [weak self] (data, response, error) in
-            if let error = error {
-                XCTFail("DataTask error: \(error.localizedDescription)")
+        sut.fetchCurrencyRates(currentDate: specificDate) { (currencies) in
+            guard let currencies = currencies else {
+                XCTFail("Currency fetch failed")
                 return
             }
 
-            guard let data = data else {
-                XCTFail("Invalid data.")
-                return
-            }
+            let usdRate = currencies.first(where: { $0.currency == "USD" })
 
-            do {
-                let responseModel = try JSONDecoder().decode(BankExchangeRate.self, from: data)
-                for rate in responseModel.exchangeRate {
-                    self?.crt.saveCurrencyRate(baseCurrencyCode: rate.baseCurrency,
-                                               currencyCode: rate.currency,
-                                               buyRate: rate.purchaseRateNB,
-                                               sellRate: rate.saleRate,
-                                               timestamp: responseModel.date)
-                }
-                expectation.fulfill()
-            } catch {
-                XCTFail("Decoding error: \(error)")
-            }
+            XCTAssertEqual(usdRate?.saleRate, 37.25)
+            XCTAssertEqual(usdRate?.purchaseRate, 36.75)
 
-        }.resume()
+            expectation.fulfill()
+        }
 
-        wait(for: [expectation], timeout: 20.0)
-    }
-    
-    func testCurrencyRateForUSD() {
-        let fetchedCurrencyRates = crt.getCurrencyRates()
-        let usdRate = fetchedCurrencyRates.first(where: { $0.currency == "USD" })
-        XCTAssertNotNil(usdRate)
-        XCTAssertEqual(usdRate?.saleRate, 37.25)
-        XCTAssertEqual(usdRate?.purchaseRate, 36.75)
+        wait(for: [expectation], timeout: 60.0)
     }
 }

@@ -16,12 +16,24 @@ protocol CurrencyAPIDelegate: AnyObject {
 struct CurrencyAPIService {
 
     weak var delegate: CurrencyAPIDelegate?
+    let currencyRepository: CurrencyRepository
     
-    func fetchCurrencyRates(completion: @escaping ([Currency]?) -> Void) {
+    init(currencyRepository: CurrencyRepository) {
+        self.currencyRepository = currencyRepository
+    }
+
+    func fetchCurrencyRates(currentDate: Date? = nil, completion: @escaping ([Currency]?) -> Void) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "dd.MM.yyyy"
-        let currentDate = dateFormatter.string(from: Date())
-        let baseURL = "https://api.privatbank.ua/p24api/exchange_rates?json&date=\(currentDate)"
+        let formattedDate: String
+
+        if let currentDate = currentDate {
+            formattedDate = dateFormatter.string(from: currentDate)
+        } else {
+            formattedDate = dateFormatter.string(from: Date())
+        }
+        
+        let baseURL = "https://api.privatbank.ua/p24api/exchange_rates?json&date=\(formattedDate)"
         guard let url = URL(string: baseURL) else {
             completion(nil)
             return
@@ -45,10 +57,11 @@ struct CurrencyAPIService {
             do {
                 let response = try JSONDecoder().decode(BankExchangeRate.self, from: data)
                 let currencies = response.exchangeRate.map { Currency(baseCurrency: $0.baseCurrency, currency: $0.currency , saleRateNB: $0.saleRateNB , purchaseRateNB: $0.purchaseRateNB, saleRate: $0.saleRate , purchaseRate: $0.purchaseRate, timestamp: response.date) }
-                saveCurrenciesToCoreData(currencies) {
-                    DispatchQueue.main.async {
-                        completion(currencies)
-                    }
+                for currency in currencies {
+                    self.currencyRepository.saveCurrencyRate(baseCurrencyCode: currency.baseCurrency, currencyCode: currency.currency, buyRate: currency.purchaseRate, sellRate: currency.saleRate, timestamp: currency.timestamp ?? "")
+                }
+                DispatchQueue.main.async {
+                    completion(currencies)
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -57,46 +70,4 @@ struct CurrencyAPIService {
             }
         }.resume()
     }
-
-    private func saveCurrenciesToCoreData(_ currencies: [Currency], completion: @escaping () -> Void) {
-        DispatchQueue.main.async {
-            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-                completion()
-                return
-            }
-            
-            let context = appDelegate.persistentContainer.viewContext
-            
-            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "CurrencyRate")
-            let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-            
-            do {
-                try context.execute(deleteRequest)
-            } catch {
-                completion()
-                return
-            }
-
-            for currency in currencies {
-                guard let purchaseRate = currency.purchaseRate, let saleRate = currency.saleRate else {
-                    continue
-                }
-                
-                let currencyRate = CurrencyRate(context: context)
-                currencyRate.baseCurrency = currency.baseCurrency
-                currencyRate.currency = currency.currency
-                currencyRate.purchaseRate = purchaseRate
-                currencyRate.saleRate = saleRate
-                currencyRate.timestamp = currency.timestamp ?? ""
-            }
-            
-            do {
-                try context.save()
-                completion()
-            } catch {
-                completion()
-            }
-        }
-    }
 }
-

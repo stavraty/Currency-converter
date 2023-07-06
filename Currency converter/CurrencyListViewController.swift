@@ -17,7 +17,7 @@ class CurrencyListViewController: UIViewController {
     @IBOutlet weak var searchBar: UISearchBar!
     
     weak var delegate: CurrencyListViewControllerDelegate?
-    internal var currencies: [Currency] = []
+    var currencies: [Currency] = []
     private var sortedCurrencies = [[Currency]]()
     private var sectionTitles = [String]()
     private let currencyFullNameMap: [String: String] = [

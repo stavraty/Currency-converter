@@ -67,7 +67,7 @@ For the app's design, we have used elements from the "Text fields" task, and you
 
 ## License
 
-This project is distributed under the [MIT License](LICENSE).
+This project is distributed under the [MIT License](https://github.com/stavraty/Currency-converter/blob/dev/LICENCE).
 
 ---
 
